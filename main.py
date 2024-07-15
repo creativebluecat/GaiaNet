@@ -29,6 +29,7 @@ def generate_meaningful_string():
 def perform_operations(url):
     retry_attempts = 30  # 设置重试次数
     driver = None  # 初始化浏览器对象
+    success_count = 0  # 记录成功执行次数
 
     while retry_attempts > 0:
         try:
@@ -70,7 +71,7 @@ def perform_operations(url):
                         is_click = False
                         print(f"Button text is '{button_text}'.")
 
-                    if  is_click:
+                    if is_click:
                         # 生成具有具体含义的随机字符串
                         random_string = generate_meaningful_string()
 
@@ -86,9 +87,19 @@ def perform_operations(url):
 
                         # 重置开始时间
                         start_time = time.time()
+
+                        # 记录成功执行次数，并检查是否达到5次
+                        success_count += 1
+                        if success_count >= 20:
+                            # 关闭当前的浏览器对象
+                            driver.quit()
+                            driver = None
+                            success_count = 0  # 重置成功执行次数计数器
+                            break  # 跳出内循环，重新创建浏览器对象
+
                     else:
                         # 检查按钮是否超过60秒在旋转
-                        if time.time() - start_time > 300:
+                        if time.time() - start_time > 60:
                             raise WebDriverException(f"{url} 上的按钮一直在旋转超过60秒，视为异常")
                         else:
                             print(f"{url} 上的按钮正在旋转，暂时无法处理")
@@ -121,6 +132,7 @@ def perform_operations(url):
 
 # 要操作的多个URL列表
 urls = [
+
     # 添加更多的URL
 ]
 
